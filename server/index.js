@@ -19,11 +19,11 @@ var key2 = ec.genKeyPair();
 var key3 = ec.genKeyPair();
 
 const pub1 = key1.getPublic().encode('hex').slice(-40);
-const pub2 = key1.getPublic().encode('hex').slice(-40);
-const pub3 = key1.getPublic().encode('hex').slice(-40);
+const pub2 = key2.getPublic().encode('hex').slice(-40);
+const pub3 = key3.getPublic().encode('hex').slice(-40);
 
 console.log({
-  address: pub1.toString(16),
+  address: pub1.toString(),
   privateKey: key1.getPrivate().toString(16),
   publicX: key1.getPublic().x.toString(16),
   publicY: key1.getPublic().y.toString(16),
@@ -42,9 +42,9 @@ console.log({
 });
 
 const balances = {
-  [pub1]: 101
-  [pub2]: 102
-  [pub3]: 103
+  [pub1]: 101,
+  [pub2]: 102,
+  [pub3]: 103,
 }
 
 app.get('/balance/:address', (req, res) => {
@@ -54,10 +54,10 @@ app.get('/balance/:address', (req, res) => {
 });
 
 app.post('/send', (req, res) => {
-  const {sender, recipient, amount, signature} = req.body;
+  const {sender, amount, recipient, signature} = req.body;
   // here is where we need to check that the message is signed with the private key of the msg sender.
   if (
-    // the signature is valid
+    sender.verify(`${sender}${amount}${recipient}`)
   ) {
       balances[sender] -= amount;
       balances[recipient] = (balances[recipient] || 0) + +amount;
