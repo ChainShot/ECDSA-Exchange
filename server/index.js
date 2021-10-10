@@ -8,7 +8,6 @@ const balances = [100, 50, 75];
 
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
-//const key = ec.genKeyPair();
 
 // localhost can have cross origin errors
 // depending on the browser you use!
@@ -18,7 +17,6 @@ app.use(express.json());
 const addresses = [];
 const transactions = [];
 
-
 class Address {
   constructor(balance) {
     this.key = ec.genKeyPair();
@@ -27,19 +25,6 @@ class Address {
     this.publicKey = this.key.getPublic().encodeCompressed('hex').toString(16);
     this.balance = balance;
   }
-}
-
-class Transactions {
-  constructor(sender, recepient, amount) {
-    this.sender = sender;
-    this.recepient = recepient;
-    this.amount = amount;
-    this.nonce = transactions.length;
-  }
-}
-
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve,ms));
 }
 
 function checkSignature(sender, privateKey) {
@@ -54,7 +39,7 @@ function checkSignature(sender, privateKey) {
 }
 
 for(let i = 0; i < numberOfAddresses; i++) {
-  addresses[i] = new Address(balances[i]);
+  balances[i] ? addresses[i] = new Address(balances[i]) : addresses[i] = new Address(0);
 }
 
 console.log("Available Accounts \n==================");
@@ -102,7 +87,7 @@ app.post('/send', (req, res) => {
   } else if(objSender.balance < amount) {
     console.log("Insufficient balance");
   } else if(checkSignature(sender, privateKey)) {
-    objSender.balance -= amount;
+    objSender.balance -= Number(amount);
     objRecipient.balance += Number(amount);
     res.send({ balance: objSender.balance });
   } else {
