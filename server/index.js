@@ -103,7 +103,7 @@ app.post('/send', (req, res) => {
     console.log("Insufficient balance");
   } else if(checkSignature(sender, privateKey)) {
     objSender.balance -= amount;
-    objRecipient = (balances[recipient] || 0) + +amount;
+    objRecipient.balance += Number(amount);
     res.send({ balance: objSender.balance });
   } else {
     console.log("Invalid private key");
